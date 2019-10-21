@@ -1,0 +1,130 @@
+---
+title: "Atelier 3"
+author: "Renac Valentine
+date: "21/10/2019"
+output:
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Tableaux de données
+
+Il y a un type d’objets que nous avons déjà abordé dans le chapitre Premier travail avec les données, il s’agit du tableau de données ou data frame en anglais.
+Propriétés et création
+
+Dans R, les tableaux de données sont tout simplement des listes avec quelques propriétés spéficiques :
+
+    les tableaux de données ne peuvent contenir que des vecteurs ;
+    tous les vecteurs d’un tableau de données ont la même longueur ;
+    tous les éléments d’un tableau de données sont nommés et ont chacun un nom unique.
+
+Dès lors, un tableau de données correspond aux fichiers de données que l’on a l’habitude de manipuler dans d’autres logiciels de statistiques comme SPSS ou Stata. Les variables sont organisées en colonnes et les observations en lignes.
+
+On peut créer un tableau de données avec la fonction data.frame :
+
+```{r}
+df <- data.frame(sexe = c("f", "f", "h", "h"), age = c(52, 31, 29, 35), blond = c(FALSE, TRUE, TRUE, FALSE))
+View(df)
+class(df$sexe)
+class(df$age)
+class(df$blond)
+```
+
+```{r}
+str(df)
+```
+La fonction data.frame a un gros défaut : si on ne désactive pas l’option stringsAsFactors elle transforme les chaînes de caractères, ici la variable sexe en facteurs (un type de vecteur que nous aborderons plus en détail dans un prochain chapitre)
+```{r}
+df <- data.frame(sexe = c("f", "f", "h", "h"), age = c(52, 31, 29, 35), blond = c(FALSE, TRUE, TRUE, FALSE), stringsAsFactors = FALSE)
+df
+```
+
+```{r}
+str(df)
+```
+
+Un tableau de données étant une liste, la fonction length renverra le nombre d’éléments de la liste, donc dans le cas présent le nombre de variables et names leurs noms :
+
+```{r}
+length(df)# nombres de variables a df
+names(df)#les variables a df
+```
+
+## Importer des données par internet
+
+```{r}
+nutriage <- read.csv("https://afalco.000webhostapp.com/cursos/nutriage.csv",header=TRUE)
+length(nutriage)
+names(nutriage)
+```
+Consommation chez hommes et femmes
+```{r}
+class(nutriage$sexe)
+class(nutriage$poisson)
+poisson.h <- nutriage$poisson[nutriage$sexe==1]
+poisson.f <- nutriage$poisson[nutriage$sexe==2]
+100*(table(poisson.h)/length(poisson.h))
+100*(table(poisson.f)/length(poisson.f))
+```
+
+```{r}
+pie(table(poisson.h), main="chez les hommes")
+```
+```{r}
+pie(table(poisson.f), main="chez les femmes")
+```
+```{r}
+pie(table(nutriage$poisson))
+```
+```{r}
+class(nutriage$sexe)
+class(nutriage$chocol)
+chocol.h <- nutriage$chocol[nutriage$sexe==1]
+chocol.f <- nutriage$chocol[nutriage$sexe==2]
+100*(table(chocol.h)/length(chocol.h))
+100*(table(chocol.f)/length(chocol.f))
+```
+```{r}
+pie(table(chocol.h), main="chez les hommes")
+```
+```{r}
+pie(table(chocol.f), main="chez les femmes")
+```
+```{r}
+pie(table(nutriage$chocol))
+```
+```{r}
+class(nutriage$age)
+table(nutriage$age)
+summary(nutriage$age)
+```
+```{r}
+viande.group1 <- nutriage$viande[nutriage$age <= median(nutriage$age)]
+viande.group2 <- nutriage$viande[nutriage$age>median(nutriage$age)]
+100*(table(viande.group1)/lenght(viande.group1))
+100*(table(viande.group2)/lenght(viande.group2))
+```
+
+```{r}
+hist(nutriage$taille,xlab="taille")
+```
+
+
+Calculer l'IMC de la population
+```{r}
+imc <- nutriage$poids/(nutriage$taille/100)^2
+hist(imc)
+nutriage <- data.frame(nutriage,imc)
+str(nutriage)
+```
+
+```{r}
+summary(imc)
+viande.group1 <- nutriage$viande[imc < 25]
+viande.group2 <- nutriage$viande[imc >= 25]
+100*(table(viande.group1)/length(viande.group1))
+100*(table(viande.group2)/length(viande.group2))
+```
